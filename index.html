@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pabellón</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #0b0b0b;
+        color: #fff;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      button,
+      input,
+      a {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app {
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .topbar {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        border-bottom: 1px solid #171717;
+      }
+
+      .icon-button {
+        width: 32px;
+        height: 32px;
+        border: 0;
+        background: transparent;
+        color: #fff;
+        font-size: 24px;
+      }
+
+      .brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 18px;
+        letter-spacing: 0.18em;
+      }
+
+      .menu {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 50;
+        width: min(72vw, 320px);
+        background: #111;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+      }
+
+      .menu.open {
+        transform: translateX(0);
+      }
+
+      .menu-inner {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+        padding: 24px;
+      }
+
+      .menu-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+
+      .menu-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 400;
+      }
+
+      .menu-item {
+        width: 100%;
+        padding: 14px 0;
+        border: 0;
+        border-bottom: 1px solid #262626;
+        background: transparent;
+        color: #fff;
+        text-align: left;
+        font-size: 18px;
+      }
+
+      .contact {
+        margin-top: auto;
+        padding-top: 24px;
+        border-top: 1px solid #404040;
+        color: #a3a3a3;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        display: none;
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      .overlay.open {
+        display: block;
+      }
+
+      .page {
+        padding: 24px;
+      }
+
+      .moose-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 260px;
+        overflow: hidden;
+      }
+
+      .moose {
+        width: min(100%, 340px);
+        height: 100%;
+      }
+
+      h1 {
+        margin: 16px 0 0;
+        font-size: 28px;
+        line-height: 1.15;
+      }
+
+      h2 {
+        margin: 0;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      .copy {
+        margin-top: 12px;
+        color: #d4d4d4;
+        line-height: 1.65;
+      }
+
+      .specimen-card {
+        margin-bottom: 16px;
+        padding: 16px;
+        border: 0;
+        border-radius: 8px;
+        background: #111;
+        color: #fff;
+        text-align: left;
+        width: 100%;
+      }
+
+      .specimen-card img {
+        display: block;
+        width: 100%;
+        height: 190px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        object-fit: cover;
+        background: #050505;
+      }
+
+      .muted {
+        color: #a3a3a3;
+        font-size: 14px;
+      }
+
+      .media {
+        position: relative;
+        height: 50vh;
+        min-height: 310px;
+        overflow: hidden;
+        background: #050505;
+      }
+
+      .media img,
+      .video-slide {
+        width: 100%;
+        height: 100%;
+      }
+
+      .media img {
+        display: block;
+        object-fit: cover;
+      }
+
+      .video-slide {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+        background: #111;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .play {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        background: #dc2626;
+        font-size: 46px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      }
+
+      .video-title {
+        margin-top: 24px;
+        font-size: 25px;
+        font-weight: 700;
+      }
+
+      .video-copy {
+        max-width: 420px;
+        margin-top: 12px;
+        color: #d4d4d4;
+        line-height: 1.55;
+      }
+
+      .fade {
+        position: absolute;
+        inset: auto 0 0;
+        height: 96px;
+        pointer-events: none;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+      }
+
+      .arrow {
+        position: absolute;
+        top: 50%;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        transform: translateY(-50%);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        font-size: 32px;
+      }
+
+      .arrow:disabled {
+        color: rgba(255, 255, 255, 0.28);
+      }
+
+      .arrow.left {
+        left: 12px;
+      }
+
+      .arrow.right {
+        right: 12px;
+      }
+
+      .dots {
+        position: absolute;
+        inset: auto 0 16px;
+        z-index: 2;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.35);
+      }
+
+      .dot.active {
+        background: #fff;
+      }
+
+      .content {
+        padding: 24px;
+      }
+
+      .story {
+        margin-top: 16px;
+        color: #e5e5e5;
+        line-height: 1.65;
+      }
+
+      .info-box {
+        margin-top: 20px;
+        padding: 16px;
+        border: 1px solid #262626;
+        border-radius: 8px;
+        background: #111;
+      }
+
+      .info-title {
+        margin-bottom: 12px;
+        color: #d6c3a3;
+        font-size: 13px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 8px 0;
+        border-bottom: 1px solid #262626;
+        font-size: 14px;
+      }
+
+      .row:last-child {
+        border-bottom: 0;
+      }
+
+      .label {
+        color: #a3a3a3;
+      }
+
+      .value {
+        text-align: right;
+      }
+
+      .link-button,
+      .staff-button {
+        margin-top: 18px;
+      }
+
+      .link-button {
+        display: inline-block;
+        border: 0;
+        background: transparent;
+        color: #d6c3a3;
+        font-size: 14px;
+      }
+
+      .staff-button {
+        width: 100%;
+        padding: 14px;
+        border: 1px solid #404040;
+        border-radius: 8px;
+        background: transparent;
+        color: #fff;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.82);
+      }
+
+      .modal.open {
+        display: flex;
+      }
+
+      .pin-box {
+        width: 260px;
+        padding: 24px;
+        border-radius: 8px;
+        background: #111;
+      }
+
+      .pin-box input {
+        width: 100%;
+        margin: 12px 0 16px;
+        padding: 10px;
+        border: 1px solid #404040;
+        background: #000;
+        color: #fff;
+      }
+
+      .pin-box button {
+        width: 100%;
+        padding: 10px;
+        border: 0;
+        border-radius: 6px;
+        background: #fff;
+        color: #000;
+      }
+
+      .staff-panel {
+        position: fixed;
+        inset: auto 0 0;
+        z-index: 55;
+        display: none;
+        padding: 24px;
+        border-top: 1px solid #404040;
+        background: #111;
+        line-height: 1.55;
+      }
+
+      .staff-panel.open {
+        display: block;
+      }
+
+      .staff-head {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <button class="icon-button" id="openMenu" aria-label="Abrir menú">☰</button>
+        <div class="brand">PABELLÓN</div>
+        <div style="width: 32px"></div>
+      </header>
+
+      <aside class="menu" id="menu">
+        <div class="menu-inner">
+          <div class="menu-head">
+            <h2 class="menu-title">Menú</h2>
+            <button class="icon-button" id="closeMenu" aria-label="Cerrar menú">×</button>
+          </div>
+          <nav id="nav"></nav>
+          <div class="contact">
+            <p>Colección privada</p>
+            <p>contact@pavilion.com</p>
+            <p>+51 999 999 999</p>
+          </div>
+        </div>
+      </aside>
+      <div class="overlay" id="overlay"></div>
+
+      <main id="view"></main>
+
+      <div class="modal" id="pinModal">
+        <div class="pin-box">
+          <p>Ingresa el PIN</p>
+          <input id="pinInput" type="password" inputmode="numeric" />
+          <button id="pinButton">Entrar</button>
+        </div>
+      </div>
+
+      <section class="staff-panel" id="staffPanel"></section>
+    </div>
+
+    <script>
+      const specimens = [
+        {
+          id: "lion",
+          animalName: "León africano",
+          huntingLocation: "Maasai Mara, Kenia",
+          huntDate: "12 de julio de 2018",
+          height: "1.20 m",
+          weight: "190 kg",
+          origin: "Sabana africana",
+          category: "Mamífero carnívoro",
+          story:
+            "Al amanecer, la sabana estaba en silencio. Este león apareció lentamente entre la hierba alta, transmitiendo dominio, control y presencia. La pieza representa el equilibrio entre poder y paciencia en la vida silvestre.",
+          gallery: [
+            "https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=1100&q=80",
+            "https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=1100&h=760&q=80",
+            "https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=1100&h=760&crop=entropy&q=80",
+          ],
+          videoUrl: "https://www.youtube.com/results?search_query=leon+africano+documental",
+          entryDate: "2019-02-01",
+          lastMaintenance: "2026-04-01",
+          nextMaintenance: "2026-06-01",
+          observations: "Condición excelente",
+        },
+        {
+          id: "elephant",
+          animalName: "Elefante africano",
+          huntingLocation: "Botswana",
+          huntDate: "5 de junio de 2017",
+          height: "3.20 m",
+          weight: "5,400 kg",
+          origin: "Llanuras y bosques africanos",
+          category: "Mamífero herbívoro",
+          story:
+            "Una presencia monumental, avanzando con una calma inesperada. Este espécimen registra la inteligencia y profundidad de uno de los animales más respetados de la naturaleza.",
+          gallery: [
+            "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=1100&q=80",
+            "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=1100&h=760&q=80",
+            "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=1100&h=760&crop=entropy&q=80",
+          ],
+          videoUrl: "https://www.youtube.com/results?search_query=elefante+africano+documental",
+          entryDate: "2018-01-01",
+          lastMaintenance: "2026-03-01",
+          nextMaintenance: "2026-05-20",
+          observations: "Requiere pulido de colmillos",
+        },
+        {
+          id: "tiger",
+          animalName: "Tigre de Bengala",
+          huntingLocation: "India",
+          huntDate: "Marzo de 2016",
+          height: "1.05 m",
+          weight: "220 kg",
+          origin: "Selvas de India",
+          category: "Mamífero carnívoro",
+          story:
+            "Oculto en la selva densa, cada movimiento parecía calculado. Este registro refleja precisión, sigilo e instinto puro.",
+          gallery: [
+            "https://images.unsplash.com/photo-1549480017-d76466a4b7e8?auto=format&fit=crop&w=1100&q=80",
+            "https://images.unsplash.com/photo-1549480017-d76466a4b7e8?auto=format&fit=crop&w=1100&h=760&q=80",
+            "https://images.unsplash.com/photo-1549480017-d76466a4b7e8?auto=format&fit=crop&w=1100&h=760&crop=entropy&q=80",
+          ],
+          videoUrl: "https://www.youtube.com/results?search_query=tigre+de+bengala+documental",
+          entryDate: "2017-05-01",
+          lastMaintenance: "2026-02-10",
+          nextMaintenance: "2026-05-10",
+          observations: "Requiere limpieza de pelaje",
+        },
+        {
+          id: "zebra",
+          animalName: "Cebra",
+          huntingLocation: "Namibia",
+          huntDate: "2019",
+          height: "1.35 m",
+          weight: "320 kg",
+          origin: "Planicies del sur de África",
+          category: "Mamífero herbívoro",
+          story:
+            "Una paradoja visual de contraste y armonía. Sus patrones funcionan como identidad y protección dentro de las planicies abiertas.",
+          gallery: [
+            "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1100&q=80",
+            "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1100&h=760&q=80",
+            "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1100&h=760&crop=entropy&q=80",
+          ],
+          videoUrl: "https://www.youtube.com/results?search_query=cebra+documental",
+          entryDate: "2020-01-01",
+          lastMaintenance: "2026-04-15",
+          nextMaintenance: "2026-07-01",
+          observations: "Condición estable",
+        },
+      ];
+
+      let page = "home";
+      let selected = specimens[0];
+      let currentSlide = 0;
+      let touchStart = null;
+
+      const view = document.getElementById("view");
+      const menu = document.getElementById("menu");
+      const overlay = document.getElementById("overlay");
+      const nav = document.getElementById("nav");
+      const pinModal = document.getElementById("pinModal");
+      const pinInput = document.getElementById("pinInput");
+      const staffPanel = document.getElementById("staffPanel");
+
+      function mooseLogo() {
+        return `
+          <svg class="moose" viewBox="0 0 520 360" role="img" aria-label="Alce blanco sin fondo">
+            <g fill="#ffffff">
+              <path d="M245 150h30l35 55-18 13 10 64-42 64-42-64 10-64-18-13 35-55Z" />
+              <path d="M218 218l-42-22-38-44 20-6 44 34 34 10-18 28Z" />
+              <path d="M302 218l42-22 38-44-20-6-44 34-34 10 18 28Z" />
+              <path d="M194 186l-92-24-54-78 4-58 24 48 2 39 32 43 88 23-4 7Z" />
+              <path d="M326 186l92-24 54-78-4-58-24 48-2 39-32 43-88 23 4 7Z" />
+              <path d="M108 157l-46-14-40-42 6-23 38 36 45 16-3 27Z" />
+              <path d="M412 157l46-14 40-42-6-23-38 36-45 16 3 27Z" />
+              <path d="M120 118l-34-26-2-46 16 24 17 20 3 28Z" />
+              <path d="M400 118l34-26 2-46-16 24-17 20-3 28Z" />
+              <path d="M165 173l-35-42 4-45 28-18-2 39 18 39-13 27Z" />
+              <path d="M355 173l35-42-4-45-28-18 2 39-18 39 13 27Z" />
+            </g>
+            <g fill="#0B0B0B">
+              <path d="M238 218l12 4-20 87-26-34 13-44 21-13Z" />
+              <path d="M282 218l-12 4 20 87 26-34-13-44-21-13Z" />
+              <path d="M229 284l25 30h-42v-22l17-8Z" />
+              <path d="M291 284l-25 30h42v-22l-17-8Z" />
+              <path d="M233 260l-12 22 17 1 3-25-8 2Z" />
+              <path d="M287 260l12 22-17 1-3-25 8 2Z" />
+              <path d="M245 150l-24 49 17 14 22-16 22 16 17-14-24-49h-30Z" opacity="0.18" />
+            </g>
+          </svg>
+        `;
+      }
+
+      function setPage(nextPage) {
+        page = nextPage;
+        closeMenu();
+        closeStaff();
+        render();
+      }
+
+      function openMenu() {
+        menu.classList.add("open");
+        overlay.classList.add("open");
+      }
+
+      function closeMenu() {
+        menu.classList.remove("open");
+        overlay.classList.remove("open");
+      }
+
+      function closeStaff() {
+        staffPanel.classList.remove("open");
+      }
+
+      function renderNav() {
+        nav.innerHTML = `
+          ${page !== "home" ? '<button class="menu-item" data-page="home">Inicio</button>' : ""}
+          <button class="menu-item" data-page="pavilion">Explorar especies</button>
+          <button class="menu-item" data-page="awareness">Concientización</button>
+        `;
+      }
+
+      function renderHome() {
+        view.innerHTML = `
+          <section class="page">
+            <div class="moose-wrap">${mooseLogo()}</div>
+            <h1>Pabellón privado</h1>
+            <p class="copy">Este proyecto plantea una experiencia digital alrededor de la caza, el registro y la conservación documental de animales dentro de una colección privada. Cada espécimen deja de ser solo una pieza física y se convierte en una entrada viva con historia, ubicación, fecha, imágenes, observaciones y datos de mantenimiento.</p>
+            <p class="copy">El valor agregado está en digitalizar la colección para obtener más información más allá de lo visible: contexto narrativo, trazabilidad, estado de conservación y acceso controlado para personal. Así, el visitante conecta con la pieza desde una capa más profunda, ordenada e interactiva.</p>
+          </section>
+        `;
+      }
+
+      function renderAwareness() {
+        view.innerHTML = `
+          <section class="page">
+            <h1>Concientización</h1>
+            <p class="copy">La caza, en nuestro territorio, nunca ha sido solo un acto de obtener “un trofeo”. Es una forma de leer el paisaje, de mantener vivos saberes que no están escritos en ningún manual: rastros, vientos, refugios, ciclos. Es parte de una cosmovisión donde el animal no es proteína, sino un otro con el que se establece relación.</p>
+            <p class="copy">Cuando la caza se regula y se dignifica, no solo se conserva fauna: se conserva hábitat, porque para que exista caza debe existir territorio sano; se conserva memoria, porque el saber del cazador mayor no se pierde; y se conserva valor, porque un venado vivo, visible y respetado, protege más bosque que cualquier prohibición.</p>
+            <p class="copy">La caza ética genera intercambio de conocimientos, ordena el uso del espacio y devuelve equilibrio. En este modelo, el animal no representa muerte: representa todo lo que fue necesario cuidar para que esté ahí.</p>
+          </section>
+        `;
+      }
+
+      function renderPavilion() {
+        view.innerHTML = `
+          <section class="page">
+            ${specimens
+              .map(
+                (item) => `
+                  <button class="specimen-card" data-specimen="${item.id}">
+                    <img src="${item.gallery[0]}" alt="${item.animalName}" />
+                    <h2>${item.animalName}</h2>
+                    <p class="muted">Toca para explorar</p>
+                  </button>
+                `
+              )
+              .join("")}
+          </section>
+        `;
+      }
+
+      function renderMedia() {
+        const total = selected.gallery.length + 1;
+        const isVideo = currentSlide === selected.gallery.length;
+        const mediaHtml = isVideo
+          ? `
+            <a class="video-slide" href="${selected.videoUrl}" target="_blank" rel="noreferrer">
+              <div class="play">▶</div>
+              <div class="video-title">Ver video relacionado</div>
+              <p class="video-copy">Toca esta tarjeta para abrir YouTube y explorar más contenido sobre ${selected.animalName.toLowerCase()}.</p>
+            </a>
+          `
+          : `<img src="${selected.gallery[currentSlide]}" alt="${selected.animalName}" />`;
+
+        return `
+          <div class="media" id="media">
+            ${mediaHtml}
+            <div class="fade"></div>
+            <button class="arrow left" id="prevSlide" ${currentSlide === 0 ? "disabled" : ""} aria-label="Imagen anterior">‹</button>
+            <button class="arrow right" id="nextSlide" ${currentSlide === total - 1 ? "disabled" : ""} aria-label="Imagen siguiente">›</button>
+            <div class="dots">
+              ${Array.from({ length: total })
+                .map(
+                  (_, index) => `
+                    <button class="dot ${index === currentSlide ? "active" : ""}" data-slide="${index}" aria-label="${index === selected.gallery.length ? "Ver video" : `Ver imagen ${index + 1}`}"></button>
+                  `
+                )
+                .join("")}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderSpecimen() {
+        view.innerHTML = `
+          <section>
+            ${renderMedia()}
+            <div class="content">
+              <h1>${selected.animalName}</h1>
+              <p class="story">${selected.story}</p>
+              <div class="info-box">
+                <div class="info-title">Ficha del espécimen</div>
+                <div class="row"><span class="label">Ubicación de caza:</span><span class="value">${selected.huntingLocation}</span></div>
+                <div class="row"><span class="label">Fecha de caza:</span><span class="value">${selected.huntDate}</span></div>
+                <div class="row"><span class="label">Altura:</span><span class="value">${selected.height}</span></div>
+                <div class="row"><span class="label">Peso:</span><span class="value">${selected.weight}</span></div>
+                <div class="row"><span class="label">Origen:</span><span class="value">${selected.origin}</span></div>
+                <div class="row"><span class="label">Categoría:</span><span class="value">${selected.category}</span></div>
+              </div>
+              <button class="link-button" id="backHome">← Volver</button>
+              <button class="staff-button" id="staffButton">Personal</button>
+            </div>
+          </section>
+        `;
+      }
+
+      function render() {
+        renderNav();
+        if (page === "home") renderHome();
+        if (page === "awareness") renderAwareness();
+        if (page === "pavilion") renderPavilion();
+        if (page === "specimen") renderSpecimen();
+        bindViewEvents();
+      }
+
+      function bindViewEvents() {
+        document.querySelectorAll("[data-page]").forEach((button) => {
+          button.addEventListener("click", () => setPage(button.dataset.page));
+        });
+
+        document.querySelectorAll("[data-specimen]").forEach((button) => {
+          button.addEventListener("click", () => {
+            selected = specimens.find((item) => item.id === button.dataset.specimen);
+            currentSlide = 0;
+            setPage("specimen");
+          });
+        });
+
+        const media = document.getElementById("media");
+        if (media) {
+          media.addEventListener("touchstart", (event) => {
+            touchStart = event.touches[0].clientX;
+          });
+          media.addEventListener("touchend", (event) => {
+            if (touchStart === null) return;
+            const distance = touchStart - event.changedTouches[0].clientX;
+            if (distance > 45) nextSlide();
+            if (distance < -45) previousSlide();
+            touchStart = null;
+          });
+        }
+
+        const prev = document.getElementById("prevSlide");
+        const next = document.getElementById("nextSlide");
+        if (prev) prev.addEventListener("click", previousSlide);
+        if (next) next.addEventListener("click", nextSlide);
+
+        document.querySelectorAll("[data-slide]").forEach((button) => {
+          button.addEventListener("click", () => {
+            currentSlide = Number(button.dataset.slide);
+            render();
+          });
+        });
+
+        const backHome = document.getElementById("backHome");
+        if (backHome) backHome.addEventListener("click", () => setPage("home"));
+
+        const staffButton = document.getElementById("staffButton");
+        if (staffButton) staffButton.addEventListener("click", openPin);
+      }
+
+      function previousSlide() {
+        if (currentSlide > 0) {
+          currentSlide -= 1;
+          render();
+        }
+      }
+
+      function nextSlide() {
+        const total = selected.gallery.length + 1;
+        if (currentSlide < total - 1) {
+          currentSlide += 1;
+          render();
+        }
+      }
+
+      function openPin() {
+        pinInput.value = "";
+        pinModal.classList.add("open");
+        pinInput.focus();
+      }
+
+      function validatePin() {
+        if (pinInput.value === "1234") {
+          pinModal.classList.remove("open");
+          staffPanel.innerHTML = `
+            <div class="staff-head">
+              <h2>Mantenimiento</h2>
+              <button class="icon-button" id="closeStaff" aria-label="Cerrar panel de personal">×</button>
+            </div>
+            <p>Ingreso al pabellón: ${selected.entryDate}</p>
+            <p>Último mantenimiento: ${selected.lastMaintenance}</p>
+            <p>Próximo mantenimiento: ${selected.nextMaintenance}</p>
+            <p>${selected.observations}</p>
+          `;
+          staffPanel.classList.add("open");
+          document.getElementById("closeStaff").addEventListener("click", closeStaff);
+        } else {
+          alert("PIN incorrecto");
+        }
+      }
+
+      document.getElementById("openMenu").addEventListener("click", openMenu);
+      document.getElementById("closeMenu").addEventListener("click", closeMenu);
+      overlay.addEventListener("click", closeMenu);
+      document.getElementById("pinButton").addEventListener("click", validatePin);
+      pinModal.addEventListener("click", (event) => {
+        if (event.target === pinModal) pinModal.classList.remove("open");
+      });
+      pinInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") validatePin();
+      });
+
+      render();
+    </script>
+  </body>
+</html>
